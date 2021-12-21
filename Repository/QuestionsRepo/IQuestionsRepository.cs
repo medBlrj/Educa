@@ -8,6 +8,7 @@ namespace Educa.Repository.QuestionsRepo
        Guid AddQuestion(Questions questions);
        Questions? GetQuestionsById(Guid Id);
        IEnumerable<Questions> GetAllQuestions();
+       bool QuestionExist(Guid Id);  
        PagedResult<Questions> GetQuestions(int page, int pageSize);
 
 

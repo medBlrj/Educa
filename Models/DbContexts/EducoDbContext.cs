@@ -1,4 +1,5 @@
 ﻿using Educa;
+using Educa.Entities.LevelEntities;
 using Educa.Entities.QuestionsEntities;
 using Educa.Entities.SubjectsEntities;
 using Educa.Repository.Entities;
@@ -12,5 +13,6 @@ public class EducoDbContext : DbContext
     }
     public DbSet<Questions> Questions { get; set; }
     public DbSet<Subjects>  Subjects { get; set; }
+    public DbSet<Level> Levels { get; set; }
 
 }

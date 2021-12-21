@@ -3,6 +3,7 @@ using Educa.Helper.GenericResponseModels;
 using Educa.Models.RequestModels;
 using Educa.Repository.Entities.QuestionsEntities.Enum;
 using Educa.Repository.QuestionsRepo;
+using Educa.Repository.SubjectRepo;
 using Educa.Services.QuestionsServices;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -15,10 +16,12 @@ namespace Educa.Controllers
     {
         private readonly IQuestionsRepository questionsRepository;
         private readonly IQuestionsServices questionServices;
-        public QuestionsController(IQuestionsRepository questionsRepository)
+        private readonly ISubjectRepository subjectRepository;
+        
+        public QuestionsController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository)
         {
             this.questionsRepository = questionsRepository;
-            this.questionServices = questionServices;   
+            this.subjectRepository = subjectRepository;  
         }
               
          
@@ -59,6 +62,10 @@ namespace Educa.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] QuestionRequest value)
         {
+            if (!subjectRepository.SubjectExist(value.SubjectId))
+            {
+                return NotFound(new ApiResponse<string>(false, "not Found", " Enter existing subjectId"));
+            } 
 
             var question = new Questions
             {
@@ -83,8 +90,12 @@ namespace Educa.Controllers
 
         // DELETE api/<QuestionsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
+            if (!questionsRepository.QuestionExist(id))
+            {
+              //  return NotFound(new ApiResponse<Guid>(true, " question not found", id));
+            }
         }
     }
 }

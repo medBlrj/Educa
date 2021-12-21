@@ -3,6 +3,7 @@ using Educa.Entities.SubjectsEntities;
 using Educa.Helper.GenericResponseModels;
 using Educa.Models.RequestModels;
 using Educa.Repository.Entities.QuestionsEntities.Enum;
+using Educa.Repository.LevelRepo;
 using Educa.Repository.QuestionsRepo;
 using Educa.Repository.SubjectRepo;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ namespace Educa.Controllers
     public class SubjectsController : ControllerBase
     {
         private readonly IQuestionsRepository questionsRepository;
+        private readonly ILevelRepository levelRepository;
         private readonly ISubjectRepository subjectRepository;
         public SubjectsController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository )
         {
@@ -23,10 +25,17 @@ namespace Educa.Controllers
         }
 
         // GET: api/<SubjectsController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [HttpGet("{id}")]
+        public IActionResult GetSubjectById(Guid id)
         {
-            return new string[] { "value1", "value2" };
+
+            var subject = subjectRepository.GetSubjectsById(id);
+            if (subject == null)
+            {
+                return NotFound(new ApiResponse<Subjects>(false, "subject Not Found", null));
+            }
+
+            return Ok(new ApiResponse<Subjects>(true, "subjects", subject));
         }
 
         // GET api/<SubjectsController>/5
@@ -45,6 +54,9 @@ namespace Educa.Controllers
         [HttpPost]
         public IActionResult AddSubjects([FromBody] SubjectsRequest value)
         {
+            if (!levelRepository.LevelExist(value.LevelId))
+                return NotFound(new ApiResponse<string>(false, "not Found"," Enter existing LevelID" ));
+
             // Add the subject
             var subject = new Subjects
             {
@@ -52,27 +64,35 @@ namespace Educa.Controllers
                 ShortDescription =  value.shortDescription ,
                 LongDescription = value.LongDescription,
                 SubjectName = value.SubjectName ,
+                LevelId = value.LevelId,
             };
             var subjectid = subjectRepository.AddSubject(subject);
-            // Add question with in Subjects
-            foreach (var Question in value.Questions)
+            if (value.Questions == null)
             {
-                var question = new Questions
+                return Ok(subjectid);
+            }else
+            {
+                // Add question with in Subjects
+                foreach (var Question in value.Questions)
                 {
-                    SubjectId= subjectid,
-                    QuestionId = Guid.NewGuid(),
-                    QNumber = Question.QuestionNumber,
-                    CorrectAnswer = Question.CorrectAnswer,
-                    PossibleAnswers = Question.PossibleAnswers,
-                    Type = (QuestionsType)Question.QuestionType,
-                    Question = Question.Question
-                };
-                var questionId = questionsRepository.AddQuestion(question);
-                subject.Questions.Add(question);
+                    var question = new Questions
+                    {
+                        SubjectId = subjectid,
+                        QuestionId = Guid.NewGuid(),
+                        QNumber = Question.QuestionNumber,
+                        CorrectAnswer = Question.CorrectAnswer,
+                        PossibleAnswers = Question.PossibleAnswers,
+                        Type = (QuestionsType)Question.QuestionType,
+                        Question = Question.Question
+                    };
+                    var questionId = questionsRepository.AddQuestion(question);
+                    subject.Questions.Add(question);
 
+                }
+                var sd = subjectRepository.UpdateSubject(subject);
+                return Ok(subjectid);
             }
-            var sd = subjectRepository.AddQuestionSubject(subject);
-            return Ok(subjectid);
+            
 
         }
 

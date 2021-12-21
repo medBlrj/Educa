@@ -7,10 +7,10 @@ namespace Educa.Repository.SubjectRepo
     {
   
             Guid AddSubject(Subjects subjects);
-            Guid AddQuestionSubject(Subjects subjects);
-            
+            Guid UpdateSubject(Subjects subjects);
             Subjects? GetSubjectsById(Guid Id);
             IEnumerable<Subjects> GetAllSubjects();
+            bool SubjectExist(Guid Id);
             PagedResult<Subjects> GetSubjects(int page, int pageSize);
 
 

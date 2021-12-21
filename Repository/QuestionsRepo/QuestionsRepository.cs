@@ -34,5 +34,10 @@ namespace Educa.Repository.QuestionsRepo
             return educoDbContext.Questions.FirstOrDefault(q => q.QuestionId == Id); 
         }
 
-}
+        public bool QuestionExist(Guid Id)
+        {
+            return educoDbContext.Questions.Any(q => q.QuestionId == Id);
+
+        }
+    }
 }

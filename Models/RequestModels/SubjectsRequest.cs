@@ -2,9 +2,12 @@
 {
     public class SubjectsRequest
     {
-        public string? shortDescription { get; set; }
         public string? SubjectName { get; set; }
+        public string? shortDescription { get; set; }
+      
         public string? LongDescription { get; set; }
+
+        public Guid LevelId { get; set; }
 
         public IList<LQuestions>? Questions { get; set; } 
 

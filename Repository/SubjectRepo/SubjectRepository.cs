@@ -13,7 +13,7 @@ namespace Educa.Repository.SubjectRepo
             this.educoDbContext = educoDbContext;
         }
 
-        public Guid AddQuestionSubject(Subjects subjects)
+        public Guid UpdateSubject(Subjects subjects)
         {
             educoDbContext.Subjects.Update(subjects);
             educoDbContext.SaveChanges();
@@ -41,6 +41,11 @@ namespace Educa.Repository.SubjectRepo
         public Subjects? GetSubjectsById(Guid Id)
         {
             return educoDbContext.Subjects.FirstOrDefault(q => q.SubjectId == Id);
+        }
+
+        public bool SubjectExist(Guid Id)
+        {
+           return educoDbContext.Subjects.Any(q => q.SubjectId == Id);  
         }
     }
 }

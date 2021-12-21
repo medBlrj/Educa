@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Educa.Repository.QuestionsRepo;
 using Educa.Services.QuestionsServices;
 using Educa.Repository.SubjectRepo;
+using Educa.Repository.LevelRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddScoped<IQuestionsRepository,QuestionsRepository >();
 builder.Services.AddScoped<IQuestionsServices, QuestionsServices>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<ILevelRepository, LevelRepository>();
 
 await using var app = builder.Build();
 
