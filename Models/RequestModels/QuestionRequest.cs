@@ -8,5 +8,6 @@
         public string? PossibleAnswers { get; set; }
         public int QuestionType { get; set; }
         public Guid SubjectId { get; set; }
+        public Guid? ContentId { get; set; }
     }
 }

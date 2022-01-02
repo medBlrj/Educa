@@ -13,15 +13,36 @@ namespace Educa.Controllers
 {
     [Route("api/subjects")]
     [ApiController]
-    public class SubjectsController : ControllerBase
+    public class SubjectController : ControllerBase
     {
         private readonly IQuestionsRepository questionsRepository;
         private readonly ILevelRepository levelRepository;
         private readonly ISubjectRepository subjectRepository;
-        public SubjectsController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository )
+        public SubjectController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository , ILevelRepository levelRepository)
         {
             this.questionsRepository = questionsRepository;
             this.subjectRepository = subjectRepository;
+            this.levelRepository = levelRepository;
+        }
+
+
+        // GET: api/<SubjectsController>/{id}/1/5
+        [HttpGet("byLevelId/{Id}/{pageNumber}/{pageSize}")]
+        public IActionResult GetSubjectbylevelId(string Id, int pageNumber, int pageSize)
+        {
+            var idGuid = new Guid(Id);
+            if (!levelRepository.LevelExist(idGuid))
+            {
+                return NotFound(new ApiResponse<string>(false, "Level not Found", " No level found with this Id"));
+            }
+
+            var subjects = subjectRepository.GetAllSubjectsByLevelId(pageNumber , pageSize , idGuid);
+            if (subjects.RowCount == 0)
+            {
+                return NotFound(new ApiResponse<String>(false, "subjects Not Found", "No subjects In this level"));
+            }
+
+            return Ok(new ApiResponse<PagedResult<Subject>>(true, "Subjects " , subjects));
         }
 
         // GET: api/<SubjectsController>
@@ -32,22 +53,22 @@ namespace Educa.Controllers
             var subject = subjectRepository.GetSubjectsById(id);
             if (subject == null)
             {
-                return NotFound(new ApiResponse<Subjects>(false, "subject Not Found", null));
+                return NotFound(new ApiResponse<Subject>(false, "subject Not Found", null));
             }
 
-            return Ok(new ApiResponse<Subjects>(true, "subjects", subject));
+            return Ok(new ApiResponse<Subject>(true, "subjects", subject));
         }
 
-        // GET api/<SubjectsController>/5
+        // GET api/<SubjectsController>/1/5
         [HttpGet("all/{pageNumber}/{pageSize}")]
         public IActionResult Get(int pageNumber , int pageSize)
         {
             var subjects = subjectRepository.GetSubjects(pageNumber, pageSize);
             if (subjects.RowCount == 0)
             {
-                return NotFound(new ApiResponse<Subjects>(false, "Not Found", null));
+                return NotFound(new ApiResponse<Subject>(false, "Not Found", null));
             }
-            return Ok(new ApiResponse<PagedResult<Subjects>>(true, "Products", subjects));
+            return Ok(new ApiResponse<PagedResult<Subject>>(true, "Products", subjects));
         }
 
         // POST api/<SubjectsController>
@@ -55,16 +76,22 @@ namespace Educa.Controllers
         public IActionResult AddSubjects([FromBody] SubjectsRequest value)
         {
             if (!levelRepository.LevelExist(value.LevelId))
-                return NotFound(new ApiResponse<string>(false, "not Found"," Enter existing LevelID" ));
+            {
+                return NotFound(new ApiResponse<string>(false, "not Found", " Enter existing LevelID"));
+            }
+               
 
             // Add the subject
-            var subject = new Subjects
+            var subject = new Subject
             {
                 SubjectId =Guid.NewGuid(),
                 ShortDescription =  value.shortDescription ,
                 LongDescription = value.LongDescription,
                 SubjectName = value.SubjectName ,
                 LevelId = value.LevelId,
+                IsPublished = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                ModifiedAt = DateTimeOffset.UtcNow,
             };
             var subjectid = subjectRepository.AddSubject(subject);
             if (value.Questions == null)
@@ -75,7 +102,7 @@ namespace Educa.Controllers
                 // Add question with in Subjects
                 foreach (var Question in value.Questions)
                 {
-                    var question = new Questions
+                    var question = new Question
                     {
                         SubjectId = subjectid,
                         QuestionId = Guid.NewGuid(),
@@ -83,7 +110,10 @@ namespace Educa.Controllers
                         CorrectAnswer = Question.CorrectAnswer,
                         PossibleAnswers = Question.PossibleAnswers,
                         Type = (QuestionsType)Question.QuestionType,
-                        Question = Question.Question
+                        Description = Question.Question,
+                        IsPublished = true,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        ModifiedAt = DateTimeOffset.UtcNow,
                     };
                     var questionId = questionsRepository.AddQuestion(question);
                     subject.Questions.Add(question);
@@ -96,10 +126,21 @@ namespace Educa.Controllers
 
         }
 
-        // PUT api/<SubjectsController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // PUT api/<SubjectsController>/ispulished/<id>
+        [HttpPut("ispulished/{id}")]
+        public IActionResult IsPublished(string id)
         {
+            var guidId = new Guid(id);
+            var subject = subjectRepository.GetSubjectsById(guidId);
+            if (subject == null)
+                return NotFound(new ApiResponse<Subject>(false, "subject Not Found", null));
+
+            if (subject.IsPublished)         
+                subject.IsPublished = false;
+            
+             
+            var sd = subjectRepository.UpdateSubject(subject);
+            return Ok(new ApiResponse<Guid>(true, "update successfully", sd));
         }
 
         // DELETE api/<SubjectsController>/5

@@ -6,7 +6,7 @@ namespace Educa.Services.QuestionsServices
 {
     public interface IQuestionsServices
     {
-        Task<IEnumerable<Questions>> ListAsync();
+        Task<IEnumerable<Question>> ListAsync();
 
 
     }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Educa.Migrations
 {
     [DbContext(typeof(EducoDbContext))]
-    partial class EducoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211229165635_Adding courses and Content entities")]
+    partial class AddingcoursesandContententities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,32 +25,23 @@ namespace Educa.Migrations
 
             modelBuilder.Entity("Educa.Entities.ContentEntities.Content", b =>
                 {
-                    b.Property<Guid>("ContentId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LongDescription")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTimeOffset>("ModifiedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("ContentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("CourseId");
 
@@ -127,9 +120,6 @@ namespace Educa.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("ContentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CorrectAnswer")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
@@ -162,8 +152,6 @@ namespace Educa.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("QuestionId");
-
-                    b.HasIndex("ContentId");
 
                     b.HasIndex("SubjectId");
 
@@ -232,17 +220,11 @@ namespace Educa.Migrations
 
             modelBuilder.Entity("Educa.Entities.QuestionsEntities.Question", b =>
                 {
-                    b.HasOne("Educa.Entities.ContentEntities.Content", "Content")
-                        .WithMany()
-                        .HasForeignKey("ContentId");
-
                     b.HasOne("Educa.Entities.SubjectsEntities.Subject", "Subjects")
                         .WithMany("Questions")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Content");
 
                     b.Navigation("Subjects");
                 });

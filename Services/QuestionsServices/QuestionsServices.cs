@@ -15,7 +15,7 @@ namespace Educa.Services.QuestionsServices
             this.questionsRepository = questionsRepository;
         }
 
-        public async Task<IEnumerable<Questions>> ListAsync()
+        public async Task<IEnumerable<Question>> ListAsync()
         {
             return  questionsRepository.GetAllQuestions();
         }

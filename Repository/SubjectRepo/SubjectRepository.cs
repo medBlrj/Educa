@@ -13,32 +13,32 @@ namespace Educa.Repository.SubjectRepo
             this.educoDbContext = educoDbContext;
         }
 
-        public Guid UpdateSubject(Subjects subjects)
+        public Guid UpdateSubject(Subject subjects)
         {
             educoDbContext.Subjects.Update(subjects);
             educoDbContext.SaveChanges();
             return subjects.SubjectId;
         }
 
-        public Guid AddSubject(Subjects subjects)
+        public Guid AddSubject(Subject subjects)
         {
             educoDbContext.Subjects.Add(subjects);
             educoDbContext.SaveChanges();
             return subjects.SubjectId;
         }
 
-        public IEnumerable<Subjects> GetAllSubjects()
+        public IEnumerable<Subject> GetAllSubjects()
         {
             return educoDbContext.Subjects;
         }
 
-        public PagedResult<Subjects> GetSubjects(int page, int pageSize)
+        public PagedResult<Subject> GetSubjects(int page, int pageSize)
         {
-            return educoDbContext.Subjects.Include(x => x.Questions).OrderBy(q => q.SubjectId).GetPaged(page, pageSize);
+            return educoDbContext.Subjects.OrderBy(q => q.SubjectId).GetPaged(page, pageSize);
 
         }
 
-        public Subjects? GetSubjectsById(Guid Id)
+        public Subject? GetSubjectsById(Guid Id)
         {
             return educoDbContext.Subjects.FirstOrDefault(q => q.SubjectId == Id);
         }
@@ -46,6 +46,12 @@ namespace Educa.Repository.SubjectRepo
         public bool SubjectExist(Guid Id)
         {
            return educoDbContext.Subjects.Any(q => q.SubjectId == Id);  
+        }
+
+        public PagedResult<Subject> GetAllSubjectsByLevelId(int page, int pageSize, Guid LevelId)
+        {
+            return educoDbContext.Subjects.Where(s => s.LevelId == LevelId).OrderBy(s => s.SubjectId).GetPaged(page, pageSize);
+
         }
     }
 }

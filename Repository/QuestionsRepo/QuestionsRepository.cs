@@ -11,7 +11,7 @@ namespace Educa.Repository.QuestionsRepo
             this.educoDbContext = educoDbContext;
         }
 
-        public Guid AddQuestion(Questions questions) {
+        public Guid AddQuestion(Question questions) {
 
             educoDbContext.Questions.Add(questions);
             educoDbContext.SaveChanges();
@@ -19,17 +19,22 @@ namespace Educa.Repository.QuestionsRepo
             
         }
 
-        public IEnumerable<Questions> GetAllQuestions()
+        public IEnumerable<Question> GetAllQuestions()
         {
             return educoDbContext.Questions;
         }
 
-        public PagedResult<Questions> GetQuestions(int page, int pageSize)
+        public PagedResult<Question> GetAllQuestionsBySupjectId(int page, int pageSize , Guid subjectId)
+        {
+            return educoDbContext.Questions.Where(q => q.SubjectId == subjectId).OrderBy(q => q.QuestionId).GetPaged(page, pageSize);
+        }
+
+        public PagedResult<Question> GetQuestions(int page, int pageSize)
         {
             return educoDbContext.Questions.OrderBy(q => q.QuestionId ).GetPaged(page, pageSize);
         }
 
-        public Questions? GetQuestionsById(Guid Id)
+        public Question? GetQuestionsById(Guid Id)
         {
             return educoDbContext.Questions.FirstOrDefault(q => q.QuestionId == Id); 
         }
@@ -38,6 +43,13 @@ namespace Educa.Repository.QuestionsRepo
         {
             return educoDbContext.Questions.Any(q => q.QuestionId == Id);
 
+        }
+
+        public Guid update(Question questions)
+        {
+           educoDbContext.Questions.Update(questions);
+            educoDbContext.SaveChanges();
+            return questions.QuestionId;
         }
     }
 }

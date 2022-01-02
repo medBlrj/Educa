@@ -12,36 +12,47 @@ namespace Educa.Controllers
 {
     [Route("api/questions")]
     [ApiController]
-    public class QuestionsController : ControllerBase 
+    public class QuestionController : ControllerBase 
     {
         private readonly IQuestionsRepository questionsRepository;
-        private readonly IQuestionsServices questionServices;
+       // private readonly IQuestionsServices questionServices;
         private readonly ISubjectRepository subjectRepository;
         
-        public QuestionsController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository)
+        public QuestionController(IQuestionsRepository questionsRepository , ISubjectRepository subjectRepository)
         {
             this.questionsRepository = questionsRepository;
             this.subjectRepository = subjectRepository;  
         }
-              
-         
-        // GET: api/<QuestionsController>
-        [HttpGet]
-        public async Task<IEnumerable<Questions>> GetAllAsunc()
-        {
-            var questions = await questionServices.ListAsync();
-            return questions;
-        }
 
+
+        // GET: api/<QuestionsController>/bysupjectid/5/1/10
+        [HttpGet("bysupjectid/{Id}/{pageNumber}/{pageSize}")]
+        public IActionResult GetGetQuestionsBySubjectId(string Id, int pageNumber, int pageSize)
+        {
+            var idGuid = new Guid(Id);
+            if (!subjectRepository.SubjectExist(idGuid))
+            {
+                return NotFound(new ApiResponse<string>(false, "Subject not Found", " No subject with this Id"));
+            }
+
+            var questions = questionsRepository.GetAllQuestionsBySupjectId(pageNumber, pageSize, idGuid);
+            if (questions.RowCount == 0)
+            {
+                return NotFound(new ApiResponse<String>(false, "Question Not Found", "No Question In this Subject"));
+            }
+
+            return Ok(new ApiResponse<PagedResult<Question>>(true, "quesTions", questions));
+        }
+        // GET: api/<QuestionsController>/all
         [HttpGet("all/{pageNumber}/{pageSize}")]
         public IActionResult GetQuestions(int pageNumber, int pageSize)
         {
             var questions = questionsRepository.GetQuestions(pageNumber, pageSize);
             if (questions.RowCount == 0)
             {
-                return NotFound(new ApiResponse<Questions>(false, "Not Found", null));
+                return NotFound(new ApiResponse<Question>(false, "Not Found", null));
             }
-            return Ok(new ApiResponse<PagedResult<Questions>>(true, "quesTions", questions));
+            return Ok(new ApiResponse<PagedResult<Question>>(true, "quesTions", questions));
         }
 
         // GET api/<QuestionsController>/5
@@ -52,10 +63,10 @@ namespace Educa.Controllers
             var question = questionsRepository.GetQuestionsById(id);
             if (question == null)
             {
-                return NotFound(new ApiResponse<Questions>(false, "Question Not Found", null));
+                return NotFound(new ApiResponse<Question>(false, "Question Not Found", null));
             }
 
-            return Ok(new ApiResponse<Questions>(true, "Question", question));
+            return Ok(new ApiResponse<Question>(true, "Question", question));
         }
 
         // POST api/<QuestionsController>
@@ -64,23 +75,44 @@ namespace Educa.Controllers
         {
             if (!subjectRepository.SubjectExist(value.SubjectId))
             {
-                return NotFound(new ApiResponse<string>(false, "not Found", " Enter existing subjectId"));
+                return NotFound(new ApiResponse<string>(false, "Subject not Found", " No subject with this Id"));
             } 
 
-            var question = new Questions
+            var question = new Question
             {
                 QuestionId = Guid.NewGuid(),
                 QNumber = value.QuestionNumber,
-                Question = value.Question,      
+                Description = value.Question,      
                 CorrectAnswer = value.CorrectAnswer,
                 PossibleAnswers = value.PossibleAnswers,
                 Type = (QuestionsType)value.QuestionType,   
                 SubjectId = value.SubjectId,
+                IsPublished = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                ModifiedAt = DateTimeOffset.UtcNow,
 
             };
             var questionId = questionsRepository.AddQuestion(question);
             return CreatedAtAction("Post", new ApiResponse<Guid>(true, "question added ssuccessfully", questionId));
         }
+
+        // PUT api/<QuestionsController>/ispulished/{id}
+        [HttpPut("ispulished/{id}")]
+        public IActionResult IsPublished(string id)
+        {
+            var guidId = new Guid(id);
+            var question = questionsRepository.GetQuestionsById(guidId);
+            if (question == null)
+                return NotFound(new ApiResponse<Question>(false, "level Not Found", null));
+
+            if (question.IsPublished)
+                question.IsPublished = false;
+          
+
+            var Id = questionsRepository.update(question);
+            return Ok(new ApiResponse<Guid>(true, "update successfully", Id));
+        }
+
 
         // PUT api/<QuestionsController>/5
         [HttpPut("{id}")]

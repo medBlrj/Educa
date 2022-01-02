@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Educa.Migrations
 {
     [DbContext(typeof(EducoDbContext))]
-    partial class EducoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211222093753_AddRootObjct to entites")]
+    partial class AddRootObjcttoentites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -20,73 +22,6 @@ namespace Educa.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
-
-            modelBuilder.Entity("Educa.Entities.ContentEntities.Content", b =>
-                {
-                    b.Property<Guid>("ContentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CourseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LongDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTimeOffset>("ModifiedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.HasKey("ContentId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("Contents");
-                });
-
-            modelBuilder.Entity("Educa.Entities.courseEntities.Course", b =>
-                {
-                    b.Property<Guid>("CourseId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<TimeSpan>("EstimatedTime")
-                        .HasColumnType("time");
-
-                    b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("LevelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("ModifiedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("CourseId");
-
-                    b.HasIndex("LevelId");
-
-                    b.ToTable("Courses");
-                });
 
             modelBuilder.Entity("Educa.Entities.LevelEntities.Level", b =>
                 {
@@ -121,13 +56,10 @@ namespace Educa.Migrations
                     b.ToTable("Levels");
                 });
 
-            modelBuilder.Entity("Educa.Entities.QuestionsEntities.Question", b =>
+            modelBuilder.Entity("Educa.Entities.QuestionsEntities.Questions", b =>
                 {
                     b.Property<Guid>("QuestionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ContentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CorrectAnswer")
@@ -136,11 +68,6 @@ namespace Educa.Migrations
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
@@ -155,6 +82,11 @@ namespace Educa.Migrations
                     b.Property<int>("QNumber")
                         .HasColumnType("int");
 
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
@@ -163,14 +95,12 @@ namespace Educa.Migrations
 
                     b.HasKey("QuestionId");
 
-                    b.HasIndex("ContentId");
-
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subject", b =>
+            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subjects", b =>
                 {
                     b.Property<Guid>("SubjectId")
                         .ValueGeneratedOnAdd()
@@ -208,46 +138,18 @@ namespace Educa.Migrations
                     b.ToTable("Subjects");
                 });
 
-            modelBuilder.Entity("Educa.Entities.ContentEntities.Content", b =>
+            modelBuilder.Entity("Educa.Entities.QuestionsEntities.Questions", b =>
                 {
-                    b.HasOne("Educa.Entities.courseEntities.Course", "Courses")
-                        .WithMany()
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Courses");
-                });
-
-            modelBuilder.Entity("Educa.Entities.courseEntities.Course", b =>
-                {
-                    b.HasOne("Educa.Entities.LevelEntities.Level", "Levels")
-                        .WithMany("Courses")
-                        .HasForeignKey("LevelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Levels");
-                });
-
-            modelBuilder.Entity("Educa.Entities.QuestionsEntities.Question", b =>
-                {
-                    b.HasOne("Educa.Entities.ContentEntities.Content", "Content")
-                        .WithMany()
-                        .HasForeignKey("ContentId");
-
-                    b.HasOne("Educa.Entities.SubjectsEntities.Subject", "Subjects")
+                    b.HasOne("Educa.Entities.SubjectsEntities.Subjects", "Subjects")
                         .WithMany("Questions")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Content");
-
                     b.Navigation("Subjects");
                 });
 
-            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subject", b =>
+            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subjects", b =>
                 {
                     b.HasOne("Educa.Entities.LevelEntities.Level", "Level")
                         .WithMany("Subjects")
@@ -260,12 +162,10 @@ namespace Educa.Migrations
 
             modelBuilder.Entity("Educa.Entities.LevelEntities.Level", b =>
                 {
-                    b.Navigation("Courses");
-
                     b.Navigation("Subjects");
                 });
 
-            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subject", b =>
+            modelBuilder.Entity("Educa.Entities.SubjectsEntities.Subjects", b =>
                 {
                     b.Navigation("Questions");
                 });

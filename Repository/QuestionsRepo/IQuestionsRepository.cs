@@ -5,11 +5,13 @@ namespace Educa.Repository.QuestionsRepo
 {
     public interface IQuestionsRepository
     {
-       Guid AddQuestion(Questions questions);
-       Questions? GetQuestionsById(Guid Id);
-       IEnumerable<Questions> GetAllQuestions();
+       Guid AddQuestion(Question questions);
+       Guid update(Question questions);
+       Question? GetQuestionsById(Guid Id);
+       IEnumerable<Question> GetAllQuestions();
+       PagedResult<Question> GetAllQuestionsBySupjectId(int page, int pageSize, Guid subjectId);
        bool QuestionExist(Guid Id);  
-       PagedResult<Questions> GetQuestions(int page, int pageSize);
+       PagedResult<Question> GetQuestions(int page, int pageSize);
 
 
     }

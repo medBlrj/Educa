@@ -36,9 +36,16 @@ namespace Educa.Controllers
 
         // GET api/<LevelController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+       public IActionResult GetLevelById(Guid id)
         {
-            return "value";
+
+            var level = levelRepository.GetLevelById(id);
+            if (level == null)
+            {
+                return NotFound(new ApiResponse<Level>(false, "level Not Found", null));
+            }
+
+            return Ok(new ApiResponse<Level>(true, "Question", level));
         }
 
         // POST api/<LevelController>
@@ -53,6 +60,9 @@ namespace Educa.Controllers
                 ShortDescription = value.shortDescription,
                 LongDescription = value.LongDescription,
                 LevelName = value.LevelName,
+                IsPublished = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                ModifiedAt = DateTimeOffset.UtcNow,
 
             };
             var levelId = levelRepository.AddLevel(level);
@@ -65,7 +75,7 @@ namespace Educa.Controllers
                 // Add subjects
                 foreach (var subjects in value.Subjects)
                 {
-                    var subject = new Subjects
+                    var subject = new Subject
                     {
                         LevelId = levelId,
                         Level = level,
@@ -73,6 +83,9 @@ namespace Educa.Controllers
                         SubjectName = subjects.SubjectName,
                         ShortDescription = subjects.shortDescription,
                         LongDescription = subjects.LongDescription,
+                        IsPublished = true ,
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        ModifiedAt = DateTimeOffset.UtcNow,
 
                     };
                     var subjectId = subjectRepository.AddSubject(subject);
@@ -89,6 +102,22 @@ namespace Educa.Controllers
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
+        }
+
+        [HttpPut("ispulished/{id}")]
+        public IActionResult IsPublished(string id)
+        {
+            var guidId = new Guid(id);
+            var level = levelRepository.GetLevelById(guidId);
+            if (level == null)
+                return NotFound(new ApiResponse<Subject>(false, "level Not Found", null));
+
+            if (level.IsPublished)
+                level.IsPublished = false;
+           
+
+            var sd = levelRepository.UpdateLevel(level);
+            return Ok(new ApiResponse<Guid>(true, "update successfully", sd));
         }
 
         // DELETE api/<LevelController>/5

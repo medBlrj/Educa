@@ -5,6 +5,8 @@ using Educa.Repository.QuestionsRepo;
 using Educa.Services.QuestionsServices;
 using Educa.Repository.SubjectRepo;
 using Educa.Repository.LevelRepo;
+using Educa.Repository.CoursesRepo;
+using Educa.Repository.ContenstRepo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,8 @@ builder.Services.AddScoped<IQuestionsRepository,QuestionsRepository >();
 builder.Services.AddScoped<IQuestionsServices, QuestionsServices>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<ILevelRepository, LevelRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IContentRepository, ContentRepository>();
 
 await using var app = builder.Build();
 

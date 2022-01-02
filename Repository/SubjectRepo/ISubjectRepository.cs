@@ -6,12 +6,13 @@ namespace Educa.Repository.SubjectRepo
     public interface ISubjectRepository
     {
   
-            Guid AddSubject(Subjects subjects);
-            Guid UpdateSubject(Subjects subjects);
-            Subjects? GetSubjectsById(Guid Id);
-            IEnumerable<Subjects> GetAllSubjects();
-            bool SubjectExist(Guid Id);
-            PagedResult<Subjects> GetSubjects(int page, int pageSize);
+            Guid AddSubject(Subject subjects);
+            Guid UpdateSubject(Subject subjects);
+            Subject? GetSubjectsById(Guid Id);
+            IEnumerable<Subject> GetAllSubjects();
+            PagedResult<Subject> GetAllSubjectsByLevelId(int page, int pageSize, Guid LevelId);
+             bool SubjectExist(Guid Id);
+            PagedResult<Subject> GetSubjects(int page, int pageSize);
 
 
     }

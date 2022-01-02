@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Educa.Entities.SubjectsEntities
 {
-    public class Subjects
+    public class Subject : RootObject
     {
         [Key]
         public Guid SubjectId { get; set; }
@@ -19,7 +19,7 @@ namespace Educa.Entities.SubjectsEntities
         
         [MaxLength(1000)]
         public string? LongDescription { get; set; }
-        public IList<Questions>? Questions { get; protected set; } = new List<Questions>();
+        public IList<Question>? Questions { get; protected set; } = new List<Question>();
 
         [ForeignKey("LevelId")]
         public Level Level { get; set; }
